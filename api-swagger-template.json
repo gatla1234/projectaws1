@@ -1,0 +1,409 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "2017-08-30T19:19:57Z",
+    "title": "xew-lowdev-demo-app"
+  },
+  "host": "xxx.execute-api.us-east-1.amazonaws.com",
+  "basePath": "/v1",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/app/{page+}": {
+      "x-amazon-apigateway-any-method": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "headers": {
+              "Content-Length": {
+                "type": "string"
+              },
+              "Content-Type": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "xew-lowdev-demo-authorizer": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": "arn:aws:iam::105605592119:role/role-access-apigateway-s3-xew-lowdev-demo-app_pages",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Content-Type": "integration.response.header.Content-Type",
+                "method.response.header.Content-Length": "integration.response.header.Content-Length"
+              }
+            }
+          },
+          "requestParameters": {
+            "integration.request.path.object": "method.request.path.page"
+          },
+          "uri": "arn:aws:apigateway:us-east-1:s3:path/xew-lowdev-demo-app_pages/{object}",
+          "passthroughBehavior": "when_no_templates",
+          "httpMethod": "ANY",
+          "cacheNamespace": "12jo6i",
+          "cacheKeyParameters": [
+            "method.request.path.page"
+          ],
+          "type": "aws"
+        }
+      }
+    },
+    "/func/AddItem": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "schema": {
+              "$ref": "#/definitions/Empty"
+            }
+          }
+        },
+        "security": [
+          {
+            "xew-lowdev-demo-authorizer": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "requestTemplates": {
+            "application/json": "\r\n#set($inputRoot = $input.path('$'))\r\n#set($inputRoot.role1 = $input.params('x-role-1'))\r\n#set($inputRoot.role2 = $input.params('x-role-2'))\r\n#set($inputRoot.role3 = $input.params('x-role-3'))\r\n#set($inputRoot.role4 = $input.params('x-role-4'))\r\n#set($inputRoot.role5 = $input.params('x-role-5'))\r\n#set($inputRoot.rolecount = $input.params('x-role-count'))\r\n#set($inputBody = $input.json('$'))\r\n\r\n$inputBody"
+          },
+          "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:105605592119:function:xew-lowdev-demo-func_add_item/invocations",
+          "passthroughBehavior": "when_no_templates",
+          "httpMethod": "POST",
+          "contentHandling": "CONVERT_TO_TEXT",
+          "type": "aws"
+        }
+      }
+    },
+    "/func/DeleteItem": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "schema": {
+              "$ref": "#/definitions/Empty"
+            }
+          }
+        },
+        "security": [
+          {
+            "xew-lowdev-demo-authorizer": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "requestTemplates": {
+            "application/json": "\r\n#set($inputRoot = $input.path('$'))\r\n#set($inputRoot.role1 = $input.params('x-role-1'))\r\n#set($inputRoot.role2 = $input.params('x-role-2'))\r\n#set($inputRoot.role3 = $input.params('x-role-3'))\r\n#set($inputRoot.role4 = $input.params('x-role-4'))\r\n#set($inputRoot.role5 = $input.params('x-role-5'))\r\n#set($inputRoot.rolecount = $input.params('x-role-count'))\r\n#set($inputBody = $input.json('$'))\r\n\r\n$inputBody"
+          },
+          "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:105605592119:function:xew-lowdev-demo-func_delete_item/invocations",
+          "passthroughBehavior": "when_no_templates",
+          "httpMethod": "POST",
+          "contentHandling": "CONVERT_TO_TEXT",
+          "type": "aws"
+        }
+      }
+    },
+    "/func/GetUserInfo": {
+      "get": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "x-cuo-2",
+            "in": "header",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "x-cuo-3",
+            "in": "header",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "x-cuo-4",
+            "in": "header",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "x-cuo-count",
+            "in": "header",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "x-cuo-5",
+            "in": "header",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "x-cuo-1",
+            "in": "header",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "schema": {
+              "$ref": "#/definitions/Empty"
+            }
+          }
+        },
+        "security": [
+          {
+            "xew-lowdev-demo-authorizer": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "requestTemplates": {
+            "application/json": "{ \n   \"cuo1\" : \"$input.params('x-cuo-1')\",\n   \"cuo2\" : \"$input.params('x-cuo-2')\",\n   \"cuo3\" : \"$input.params('x-cuo-3')\",\n   \"cuo4\" : \"$input.params('x-cuo-4')\",\n   \"cuo5\" : \"$input.params('x-cuo-5')\",\n   \"cuocount\" : \"$input.params('x-cuo-count')\"\n}"
+          },
+          "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:105605592119:function:xew-lowdev-demo-func_get_user_info/invocations",
+          "passthroughBehavior": "when_no_templates",
+          "httpMethod": "POST",
+          "contentHandling": "CONVERT_TO_TEXT",
+          "type": "aws"
+        }
+      }
+    },
+    "/func/GetUserRole": {
+      "get": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "x-role-5",
+            "in": "header",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "x-role-count",
+            "in": "header",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "x-role-3",
+            "in": "header",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "x-role-4",
+            "in": "header",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "x-role-1",
+            "in": "header",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "x-role-2",
+            "in": "header",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "schema": {
+              "$ref": "#/definitions/Empty"
+            }
+          }
+        },
+        "security": [
+          {
+            "xew-lowdev-demo-authorizer": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "requestTemplates": {
+            "application/json": "{ \r\n   \"role1\" : \"$input.params('x-role-1')\",\r\n   \"role2\" : \"$input.params('x-role-2')\",\r\n   \"role3\" : \"$input.params('x-role-3')\",\r\n   \"role4\" : \"$input.params('x-role-4')\",\r\n   \"role5\" : \"$input.params('x-role-5')\",\r\n   \"rolecount\" : \"$input.params('x-role-count')\"\r\n}"
+          },
+          "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:105605592119:function:xew-lowdev-demo-func_get_user_roles/invocations",
+          "passthroughBehavior": "when_no_templates",
+          "httpMethod": "POST",
+          "contentHandling": "CONVERT_TO_TEXT",
+          "type": "aws"
+        }
+      }
+    },
+    "/func/ListItems": {
+      "get": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "schema": {
+              "$ref": "#/definitions/Empty"
+            },
+            "headers": {
+              "Content-Type": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "xew-lowdev-demo-authorizer": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Content-Type": "integration.response.header.Content-Type"
+              }
+            }
+          },
+          "requestTemplates": {
+            "application/json": "\r\n#set($inputRoot = $input.path('$'))\r\n#set($inputRoot.role1 = $input.params('x-role-1'))\r\n#set($inputRoot.role2 = $input.params('x-role-2'))\r\n#set($inputRoot.role3 = $input.params('x-role-3'))\r\n#set($inputRoot.role4 = $input.params('x-role-4'))\r\n#set($inputRoot.role5 = $input.params('x-role-5'))\r\n#set($inputRoot.rolecount = $input.params('x-role-count'))\r\n#set($inputBody = $input.json('$'))\r\n\r\n$inputBody"
+          },
+          "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:105605592119:function:xew-lowdev-demo-func_list_items/invocations",
+          "passthroughBehavior": "when_no_templates",
+          "httpMethod": "POST",
+          "contentHandling": "CONVERT_TO_TEXT",
+          "type": "aws"
+        }
+      }
+    },
+    "/func/UpdateItem": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "x-jwt-token",
+            "in": "header",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "schema": {
+              "$ref": "#/definitions/Empty"
+            }
+          }
+        },
+        "security": [
+          {
+            "xew-lowdev-demo-authorizer": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "requestTemplates": {
+            "application/json": "\r\n#set($inputRoot = $input.path('$'))\r\n#set($inputRoot.role1 = $input.params('x-role-1'))\r\n#set($inputRoot.role2 = $input.params('x-role-2'))\r\n#set($inputRoot.role3 = $input.params('x-role-3'))\r\n#set($inputRoot.role4 = $input.params('x-role-4'))\r\n#set($inputRoot.role5 = $input.params('x-role-5'))\r\n#set($inputRoot.rolecount = $input.params('x-role-count'))\r\n#set($inputBody = $input.json('$'))\r\n\r\n$inputBody\r\n"
+          },
+          "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:105605592119:function:xew-lowdev-demo-func_update_item/invocations",
+          "passthroughBehavior": "when_no_templates",
+          "httpMethod": "POST",
+          "contentHandling": "CONVERT_TO_TEXT",
+          "type": "aws"
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "xew-lowdev-demo-authorizer": {
+      "type": "apiKey",
+      "name": "x-jwt-token",
+      "in": "header",
+      "x-amazon-apigateway-authtype": "custom",
+      "x-amazon-apigateway-authorizer": {
+        "authorizerUri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:105605592119:function:xew-lowdev-demo-authorizer/invocations",
+        "authorizerResultTtlInSeconds": 300,
+        "type": "token"
+      }
+    }
+  },
+  "definitions": {
+    "Empty": {
+      "type": "object",
+      "title": "Empty Schema"
+    }
+  }
+}
