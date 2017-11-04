@@ -1,0 +1,1523 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "TrustBuilder Single SignOn Cluster and all related components",
+    "Parameters": {
+        "PipelineName": {
+            "Description": "Pipeline name that will affect the name of most resources",
+            "Default": "TBEC2",
+            "Type": "String"
+        },
+        "SecuityStackPipelineName": {
+            "Description": "Name of the security stack pipeline name used to find the proper exports",
+            "Default": "TB",
+            "Type": "String"
+        },
+        "VPCStackName": {
+            "Description": "Name of the Public Services VPC where these artefact will be deployed",
+            "Default": "MCF-VPC-Exports",
+            "Type": "String"
+        },
+		  "ClusterSize": {
+            "Type": "String",
+            "Default": "SINGLE_INSTANCE",
+            "AllowedValues": [
+                "SINGLE_INSTANCE",
+                "FULL_SIZE"
+            ],
+            "Description": "Cluster Size."
+        },
+        "LoadBalancerVisibility": {
+            "Description": "Defines whether the cluster has internal or external visibility",
+            "Default": "internal",
+            "AllowedValues": [
+                "internal",
+                "external"
+            ],
+            "Type": "String"
+        },
+        
+       
+       
+        "GatewayLBSSLCertArn": {
+            "Description": "ARN of the Load Balancer SSL Certificate stored in IAM",
+            "Default": "arn:aws:acm:us-east-1:242031870251:certificate/a1513be4-f601-48bf-b222-0747254e4296",
+            "Type": "String"
+        },
+        "AdminLBSSLCertArn": {
+            "Description": "ARN of the Load Balancer SSL Certificate stored in IAM",
+            "Default": "arn:aws:acm:us-east-1:242031870251:certificate/a1513be4-f601-48bf-b222-0747254e4296",
+            "Type": "String"
+        },       
+        
+        "NAMELoadBalancer": {
+            "Description": "Load Balancer Name",
+            "Default": "TBGateway-LB-Name",
+            "Type": "String"
+        },
+        "NAMEELBUnhealthyHostAlarm": {
+            "Default": "TGBateway-ELB-Unhealty-Hosts",
+            "Description": "ELB Unhealthy hosts alarm",
+            "Type": "String"
+        },
+        "NAMEELB500Errors": {
+            "Default": "TGBateway-ELB-HTTP-500",
+            "Description": "ELB HTTP500 errors alarm",
+            "Type": "String"
+        },
+        "NAMEELBLatencyAlarm": {
+            "Default": "TGBateway-ELB-Latency-Alarm",
+            "Description": "ELB Latency alarm",
+            "Type": "String"
+        },
+       
+        "TAGApplicationID": {
+            "Default": "ABC",
+            "Description": "SYSID Tag that owns this stack",
+            "Type": "String",
+            "ConstraintDescription": "[A-Z][A-Z][A-Z]"
+        },
+        "TAGCreatedBy": {
+            "Default": "user@dtcc.com",
+            "Description": "Created By Tag for all resources in stack",
+            "Type": "String"
+        },
+        "TAGDescription": {
+            "Default": "Pure Awesomeness",
+            "Description": "Purpose Tag for all resourced in stack",
+            "Type": "String"
+        },
+        "TAGEnvironment": {
+            "Default": "Sandbox",
+            "Description": "Purpose Tag for all resourced in stack",
+            "Type": "String"
+        },
+        "TAGDataClass": {
+            "Default": "Red",
+            "Description": "Data Classification for resources in this stack",
+            "Type": "String"
+        },
+        "TAGTerminationDate": {
+            "Default": "3000-01-01",
+            "Description": "Data Classification for resources in this stack",
+            "Type": "String"
+        },
+        "TAGCostCenter": {
+            "Default": "0000",
+            "Description": "Cost Center associated with resources in this stack",
+            "Type": "String"
+        }
+    },
+    "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "General Settings"
+                    },
+                    "Parameters": [
+                        "PipelineName",
+                        "SecuityStackPipelineName",
+                        "VPCStackName",
+						 "ClusterSize",
+                        "LoadBalancerVisibility",
+                        "EnvCode",
+                        "GatewayLBSSLCertArn",
+                        "AdminLBSSLCertArn"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Resource Names"
+                    },
+                    "Parameters": [
+                        "NAMEInstance1Suffix",
+                        "NAMEInstance2Suffix",
+                        "NAMEInstance3Suffix",
+                        "NAMELoadBalancer",
+                        "NAMEELBUnhealthyHostAlarm",
+                        "NAMEELBLatencyAlarm",
+                        "NAMEELB500Errors",
+                        "NAMETBBackend1StatusCheckAlarm",
+                        "NAMETBBackend2StatusCheckAlarm",
+                        "NAMETBBackend3StatusCheckAlarm"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Resource Tags"
+                    },
+                    "Parameters": [
+                        "TAGApplicationID",
+                        "TAGCreatedBy",
+                        "TAGDescription",
+                        "TAGEnvironment",
+                        "TAGDataClass",
+                        "TAGTerminationDate",
+                        "TAGCostCenter"
+                    ]
+                }
+            ],
+            "ParameterLabels": {
+                "PipelineName": {
+                    "default": "Pipeline Name"
+                },
+                "SecuityStackPipelineName": {
+                    "default": "Security Stack Pipeline Name"
+                },
+                "VPCStackName": {
+                    "default": "VPC Stack Name"
+                },
+				"ClusterSize": {
+                    "default": "Cluster Size"
+                },
+                "LoadBalancerVisibility": {
+                    "default": "Cluster Visibility"
+                },
+                "EnvCode": {
+                    "default": "Environment Code"
+                },           
+                "GatewayLBSSLCertArn": {
+                    "default": "Gateway LB SSL Cert ARN"
+                },
+                "AdminLBSSLCertArn": {
+                    "default": "Admin LB SSL Cert ARN"
+                },
+                "NAMEInstance1Suffix": {
+                    "default": "Instance 1 numeric suffix"
+                },
+                "NAMEInstance2Suffix": {
+                    "default": "Instance 1 numeric suffix"
+                },
+                "NAMEInstance3Suffix": {
+                    "default": "Instance 1 numeric suffix"
+                },
+                "NAMELoadBalancer": {
+                    "default": "Load Balancer Name"
+                },
+                "NAMEELBUnhealthyHostAlarm": {
+                    "default": "ELB Unhealthy hosts alarm name"
+                },
+                "NAMEELBLatencyAlarm": {
+                    "default": "ELB Latency Alarm Name"
+                },
+                "NAMEELB500Errors": {
+                    "default": "ELB HTTP500 Errors Alarms Name"
+                },
+                "NAMETBBackend1StatusCheckAlarm": {
+                    "default": "Backend 1 status check alarm"
+                },
+                "NAMETBBackend2StatusCheckAlarm": {
+                    "default": "Backend 1 status check alarm"
+                },
+                "NAMETBBackend3StatusCheckAlarm": {
+                    "default": "Backend 1 status check alarm"
+                },
+                "TAGApplicationID": {
+                    "default": "Application (SYS) ID Tag"
+                },
+                "TAGCreatedBy": {
+                    "default": "Created By Tag"
+                },
+                "TAGDescription": {
+                    "default": "Purpose Tag"
+                },
+                "TAGEnvironment": {
+                    "default": "Environment Tag"
+                },
+                "TAGDataClass": {
+                    "default": "Data Classification Tag"
+                },
+                "TAGTerminationDate": {
+                    "default": "Termination Date Tag"
+                },
+                "TAGCostCenter": {
+                    "default": "Cost Center Tag"
+                }
+            }
+        },
+        "AWS::CloudFormation::Designer": {
+            "55afa97f-71d3-4778-ad3d-5a0f615a3ca0": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 300,
+                    "y": 30
+                },
+                "z": 1,
+                "embeds": [],
+                "isconnectedto": [
+                    "2b98c9c8-fef6-4649-9938-7f8cb22b91c1",
+                    "643d88b1-0da8-4245-875f-415b76699d95",
+                    "b1cf8b05-80ae-413f-b145-7a3be258d1b2",
+                    "1fde8092-e74c-458f-b48b-6b57b5f0b53b"
+                ]
+            },
+            "2b98c9c8-fef6-4649-9938-7f8cb22b91c1": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 210,
+                    "y": -20
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "643d88b1-0da8-4245-875f-415b76699d95": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": -420,
+                    "y": -160
+                },
+                "z": 0,
+                "embeds": []
+            },
+            "fb0f7e22-cbee-431a-bd63-db28566ce274": {
+                "source": {
+                    "id": "55afa97f-71d3-4778-ad3d-5a0f615a3ca0"
+                },
+                "target": {
+                    "id": "2b98c9c8-fef6-4649-9938-7f8cb22b91c1"
+                },
+                "z": 1
+            },
+            "1293a959-96bc-439c-8643-170ab7e4ce1a": {
+                "source": {
+                    "id": "55afa97f-71d3-4778-ad3d-5a0f615a3ca0"
+                },
+                "target": {
+                    "id": "643d88b1-0da8-4245-875f-415b76699d95"
+                },
+                "z": 2
+            },
+            "bf2dcd9d-fdb4-4af4-a631-6a7f1f10582e": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": -610,
+                    "y": -10
+                },
+                "z": 0,
+                "embeds": []
+            },
+            "590692c5-0a51-4edf-8418-761ef90639b3": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": -510,
+                    "y": -10
+                },
+                "z": 0,
+                "embeds": []
+            },
+            "d967e2b8-9b5a-4f0a-870c-412426a569b5": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 30,
+                    "y": 90
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "d2978ccf-eb57-4742-b5c2-5de90e7c22b6": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": -60,
+                    "y": 90
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "6a063908-7858-484e-bb8f-e1c7444e071f": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 120,
+                    "y": 90
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "1fde8092-e74c-458f-b48b-6b57b5f0b53b": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 210,
+                    "y": 90
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "b1cf8b05-80ae-413f-b145-7a3be258d1b2": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 120,
+                    "y": -20
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "127ede8e-b2eb-4102-9020-dfdac785a3d9": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 300,
+                    "y": 130
+                },
+                "z": 0,
+                "embeds": []
+            },
+            "e890ba8b-a45d-4d33-aa04-9243a4d7864c": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 390,
+                    "y": 390
+                },
+                "z": 1,
+                "embeds": [],
+                "isrelatedto": [
+                    "55afa97f-71d3-4778-ad3d-5a0f615a3ca0",
+                    "8bcfe26c-3b98-495b-9052-bdaa90e49f7f",
+                    "ca0729ed-e3de-49a1-a03f-a92814d3b8ef"
+                ]
+            },
+            "5795953d-95d7-4c1d-8d75-ccef1c0d9135": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 300,
+                    "y": 390
+                },
+                "z": 1,
+                "embeds": [],
+                "isrelatedto": [
+                    "55afa97f-71d3-4778-ad3d-5a0f615a3ca0",
+                    "8bcfe26c-3b98-495b-9052-bdaa90e49f7f",
+                    "ca0729ed-e3de-49a1-a03f-a92814d3b8ef"
+                ]
+            },
+            "1dba62b8-165c-4582-9608-601d7429a688": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 210,
+                    "y": 390
+                },
+                "z": 1,
+                "embeds": [],
+                "isrelatedto": [
+                    "55afa97f-71d3-4778-ad3d-5a0f615a3ca0",
+                    "8bcfe26c-3b98-495b-9052-bdaa90e49f7f",
+                    "ca0729ed-e3de-49a1-a03f-a92814d3b8ef",
+                    "70091299-25e3-4d5b-9b36-a07427ecc65f"
+                ]
+            },
+            "88af2ea1-af59-47b8-9b3e-bb0088f4f7d8": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": -60,
+                    "y": 390
+                },
+                "z": 1,
+                "embeds": [],
+                "isrelatedto": [
+                    "d2978ccf-eb57-4742-b5c2-5de90e7c22b6"
+                ]
+            },
+            "be44cf4e-724b-4603-bd48-41e99e0af231": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 120,
+                    "y": 390
+                },
+                "z": 1,
+                "embeds": [],
+                "isrelatedto": [
+                    "6a063908-7858-484e-bb8f-e1c7444e071f"
+                ]
+            },
+            "723345db-4091-42ec-9475-e5c4a0e2e098": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 30,
+                    "y": 390
+                },
+                "z": 1,
+                "embeds": [],
+                "isrelatedto": [
+                    "d967e2b8-9b5a-4f0a-870c-412426a569b5"
+                ]
+            },
+            "ca0729ed-e3de-49a1-a03f-a92814d3b8ef": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 380,
+                    "y": 180
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "70091299-25e3-4d5b-9b36-a07427ecc65f": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 380,
+                    "y": 40
+                },
+                "z": 1,
+                "embeds": [],
+                "isrelatedto": [
+                    "2b98c9c8-fef6-4649-9938-7f8cb22b91c1",
+                    "b1cf8b05-80ae-413f-b145-7a3be258d1b2",
+                    "1fde8092-e74c-458f-b48b-6b57b5f0b53b"
+                ]
+            },
+            "e3f586d4-aa3a-4dcb-ba73-fa10ec4bd8a2": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 660,
+                    "y": 40
+                },
+                "z": 0,
+                "embeds": [],
+                "isconnectedto": [
+                    "d713b9c8-38ec-4e3c-81a0-64f212e4cae3"
+                ]
+            },
+            "d713b9c8-38ec-4e3c-81a0-64f212e4cae3": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 580,
+                    "y": 270
+                },
+                "z": 1,
+                "embeds": [],
+                "isassociatedwith": [
+                    "ca0729ed-e3de-49a1-a03f-a92814d3b8ef"
+                ],
+                "isrelatedto": [
+                    "70091299-25e3-4d5b-9b36-a07427ecc65f",
+                    "8bcfe26c-3b98-495b-9052-bdaa90e49f7f"
+                ]
+            },
+            "df9d66f6-247a-412f-9e04-b75c0be2000f": {
+                "source": {
+                    "id": "d713b9c8-38ec-4e3c-81a0-64f212e4cae3"
+                },
+                "target": {
+                    "id": "ca0729ed-e3de-49a1-a03f-a92814d3b8ef"
+                },
+                "z": 2
+            },
+            "7bc29697-71e8-4c57-a2e3-ae456ad9f836": {
+                "source": {
+                    "id": "e3f586d4-aa3a-4dcb-ba73-fa10ec4bd8a2"
+                },
+                "target": {
+                    "id": "d713b9c8-38ec-4e3c-81a0-64f212e4cae3"
+                },
+                "z": 3
+            },
+            "8bcfe26c-3b98-495b-9052-bdaa90e49f7f": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 300,
+                    "y": 270
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "deb38a14-eb81-4871-8729-4df71f581fdd": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 510,
+                    "y": 180
+                },
+                "z": 1,
+                "embeds": [],
+                "isassociatedwith": [
+                    "ca0729ed-e3de-49a1-a03f-a92814d3b8ef"
+                ],
+                "isrelatedto": [
+                    "70091299-25e3-4d5b-9b36-a07427ecc65f",
+                    "8bcfe26c-3b98-495b-9052-bdaa90e49f7f"
+                ]
+            },
+            "6da71610-8708-4bb0-9742-442f67a9816d": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 480,
+                    "y": 270
+                },
+                "z": 1,
+                "embeds": [],
+                "isassociatedwith": [
+                    "8bcfe26c-3b98-495b-9052-bdaa90e49f7f"
+                ],
+                "isrelatedto": [
+                    "70091299-25e3-4d5b-9b36-a07427ecc65f",
+                    "0bc1642a-f8e9-4584-95b4-a83eea526467"
+                ]
+            },
+            "e31bacd0-91ac-42f7-9f36-6ffe6c6d876d": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 390,
+                    "y": 270
+                },
+                "z": 1,
+                "embeds": [],
+                "isassociatedwith": [
+                    "8bcfe26c-3b98-495b-9052-bdaa90e49f7f"
+                ],
+                "isrelatedto": [
+                    "70091299-25e3-4d5b-9b36-a07427ecc65f",
+                    "0bc1642a-f8e9-4584-95b4-a83eea526467"
+                ]
+            },
+            "0bc1642a-f8e9-4584-95b4-a83eea526467": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 510,
+                    "y": 40
+                },
+                "z": 1,
+                "embeds": [],
+                "isrelatedto": [
+                    "2b98c9c8-fef6-4649-9938-7f8cb22b91c1",
+                    "b1cf8b05-80ae-413f-b145-7a3be258d1b2",
+                    "1fde8092-e74c-458f-b48b-6b57b5f0b53b"
+                ]
+            }
+        }
+    },
+     "Conditions": {
+        "SINGLE_INSTANCE_CLUSTER": {
+            "Fn::Equals": [
+                {
+                    "Ref": "ClusterSize"
+                },
+                "SINGLE_INSTANCE"
+            ]
+        },
+        "FULL_SIZE_CLUSTER": {
+            "Fn::Equals": [
+                {
+                    "Ref": "ClusterSize"
+                },
+                "FULL_SIZE"
+            ]
+        },
+        "internalLB": {
+            "Fn::Equals": [
+                {
+                    "Ref": "LoadBalancerVisibility"
+                },
+                "internal"
+            ]
+        },
+        "externalLB": {
+            "Fn::Equals": [
+                {
+                    "Ref": "LoadBalancerVisibility"
+                },
+                "external"
+            ]
+        }
+    },
+    "Resources": {
+        
+        "ELBUnhealthyHostAlarm": {
+            "Type": "AWS::CloudWatch::Alarm",
+            "Properties": {
+                "ActionsEnabled": "true",
+                "AlarmActions": [
+                    {
+                        "Fn::ImportValue": "MCF-LowDevAdminGroup"
+                    }
+                ],
+                "AlarmDescription": {
+                    "Fn::Sub": "TBGateway ${LoadBalancerVisibility} Load Balancer Unhealthy host alarm. Triggers as soon as an unhealthy host is detected"
+                },
+                "AlarmName": {
+                    "Ref": "NAMEELBUnhealthyHostAlarm"
+                },
+                "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+                "Dimensions": [
+                    {
+                        "Name": "LoadBalancer",
+                        "Value": {
+                            "Fn::If": [
+                                "internalLB",
+                                {
+                                    "Fn::GetAtt": [
+                                        "SSOInternalLB",
+                                        "LoadBalancerFullName"
+                                    ]
+                                },
+                                {
+                                    "Fn::GetAtt": [
+                                        "SSOExternalLB",
+                                        "LoadBalancerFullName"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "Name": "TargetGroup",
+                        "Value": {
+                            "Fn::If": [
+                                "internalLB",
+                                {
+                                    "Fn::GetAtt": [
+                                        "SSOAppLBV2TargetGroup",
+                                        "TargetGroupFullName"
+                                    ]
+                                },
+                                {
+                                    "Fn::GetAtt": [
+                                        "SSOAppLBV2TargetGroup",
+                                        "TargetGroupFullName"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "EvaluationPeriods": 3,
+                "MetricName": "UnHealthyHostCount",
+                "Namespace": "AWS/ApplicationELB",
+                "Period": 300,
+                "Statistic": "Average",
+                "Threshold": 1,
+                "Unit": "Count"
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "1dba62b8-165c-4582-9608-601d7429a688"
+                }
+            }
+        },
+        "ELBLatencyAlarm": {
+            "Type": "AWS::CloudWatch::Alarm",
+            "Properties": {
+                "ActionsEnabled": "true",
+                "AlarmActions": [
+                    {
+                        "Fn::ImportValue": "MCF-LowDevAdminGroup"
+                    }
+                ],
+                "AlarmDescription": {
+                    "Fn::Sub": "TBGateway ${LoadBalancerVisibility} Load Balancer Latency Alarm. Triggers when the average latency becomes excessive"
+                },
+                "AlarmName": {
+                    "Ref": "NAMEELBLatencyAlarm"
+                },
+                "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+                "Dimensions": [
+                    {
+                        "Name": "LoadBalancer",
+                        "Value": {
+                            "Fn::If": [
+                                "internalLB",
+                                {
+                                    "Fn::GetAtt": [
+                                        "SSOInternalLB",
+                                        "LoadBalancerFullName"
+                                    ]
+                                },
+                                {
+                                    "Fn::GetAtt": [
+                                        "SSOExternalLB",
+                                        "LoadBalancerFullName"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "EvaluationPeriods": 1,
+                "MetricName": "TargetResponseTime",
+                "Namespace": "AWS/ApplicationELB",
+                "Period": 60,
+                "Statistic": "Average",
+                "Threshold": 10,
+                "Unit": "Seconds"
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "e890ba8b-a45d-4d33-aa04-9243a4d7864c"
+                }
+            }
+        },
+        "ELB500Errors": {
+            "Type": "AWS::CloudWatch::Alarm",
+            "Properties": {
+                "ActionsEnabled": "true",
+                "AlarmActions": [
+                    {
+                        "Fn::ImportValue": "MCF-LowDevAdminGroup"
+                    }
+                ],
+                "AlarmDescription": {
+                    "Fn::Sub": "TBGateway ${LoadBalancerVisibility} Load Balancer 500 Alarm. Triggers when too many HTTP 500 errors are retuned by the hosts"
+                },
+                "AlarmName": {
+                    "Ref": "NAMEELB500Errors"
+                },
+                "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+                "Dimensions": [
+                    {
+                        "Name": "LoadBalancer",
+                        "Value": {
+                            "Fn::If": [
+                                "internalLB",
+                                {
+                                    "Fn::GetAtt": [
+                                        "SSOInternalLB",
+                                        "LoadBalancerFullName"
+                                    ]
+                                },
+                                {
+                                    "Fn::GetAtt": [
+                                        "SSOExternalLB",
+                                        "LoadBalancerFullName"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "EvaluationPeriods": 1,
+                "MetricName": "HTTPCode_ELB_5XX_Count",
+                "Namespace": "AWS/ApplicationELB",
+                "Period": 300,
+                "Statistic": "Sum",
+                "Threshold": 5,
+                "Unit": "Count"
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "5795953d-95d7-4c1d-8d75-ccef1c0d9135"
+                }
+            }
+        },
+      
+        "SSOInternalLB": {
+            "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+            "Properties": {
+                "Name": {
+                    "Fn::If": [
+                        "internalLB",
+                        {
+                            "Ref": "NAMELoadBalancer"
+                        },
+                        {
+                            "Fn::Sub": "${NAMELoadBalancer}-admin"
+                        }
+                    ]
+                },
+                "LoadBalancerAttributes": [
+                    {
+                        "Key": "access_logs.s3.enabled",
+                        "Value": "true"
+                    },
+                    {
+                        "Key": "access_logs.s3.bucket",
+                        "Value": {
+                            "Fn::ImportValue": {
+                                "Fn::Sub": "${TAGApplicationID}-${SecuityStackPipelineName}-TBGatewaySecurity-S3LoggingBucket"
+                            }
+                        }
+                    },
+                    {
+                        "Key": "access_logs.s3.prefix",
+                        "Value": {
+                            "Fn::If": [
+                                "internalLB",
+                                {
+                                    "Fn::Sub": "${NAMELoadBalancer}-Logs"
+                                },
+                                {
+                                    "Fn::Sub": "${NAMELoadBalancer}-admin-Logs"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "Key": "deletion_protection.enabled",
+                        "Value": "false"
+                    }
+                ],
+                "Scheme": "internal",
+                "SecurityGroups": [
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${TAGApplicationID}-${SecuityStackPipelineName}-TBGatewaySecurity-InternalLoadBalancerSecurityGroup"
+                        }
+                    }
+                ],
+                "Subnets": {
+                    "Fn::If": [
+                        "SINGLE_INSTANCE_CLUSTER",
+                        [
+                            {
+                                "Fn::ImportValue": {
+                                    "Fn::Sub": "${VPCStackName}-PrivateSubnet1"
+                                }
+                            },
+                            {
+                                "Fn::ImportValue": {
+                                    "Fn::Sub": "${VPCStackName}-PrivateSubnet2"
+                                }
+                            }
+                        ],
+                        [
+                            {
+                                "Fn::ImportValue": {
+                                    "Fn::Sub": "${VPCStackName}-PrivateSubnet1"
+                                }
+                            },
+                            {
+                                "Fn::ImportValue": {
+                                    "Fn::Sub": "${VPCStackName}-PrivateSubnet2"
+                                }
+                            },
+                            {
+                                "Fn::ImportValue": {
+                                    "Fn::Sub": "${VPCStackName}-PrivateSubnet3"
+                                }
+                            }
+                        ]
+                    ]
+                },
+                "Tags": [
+                    {
+                        "Key": "Application_ID",
+                        "Value": {
+                            "Ref": "TAGApplicationID"
+                        }
+                    },
+                    {
+                        "Key": "Description",
+                        "Value": {
+                            "Ref": "TAGDescription"
+                        }
+                    },
+                    {
+                        "Key": "Created_By",
+                        "Value": {
+                            "Ref": "TAGCreatedBy"
+                        }
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": {
+                            "Ref": "TAGEnvironment"
+                        }
+                    },
+                    {
+                        "Key": "Data_Class",
+                        "Value": {
+                            "Ref": "TAGDataClass"
+                        }
+                    },
+                    {
+                        "Key": "Termination_Date",
+                        "Value": {
+                            "Ref": "TAGTerminationDate"
+                        }
+                    },
+                    {
+                        "Key": "Cost_Center",
+                        "Value": {
+                            "Ref": "TAGCostCenter"
+                        }
+                    }
+                ],
+                "IpAddressType": "ipv4"
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "8bcfe26c-3b98-495b-9052-bdaa90e49f7f"
+                }
+            }
+        },
+        "SSOExternalLB": {
+            "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+            "Condition": "externalLB",
+            "Properties": {
+                "Name": {
+                    "Ref": "NAMELoadBalancer"
+                },
+                "LoadBalancerAttributes": [
+                    {
+                        "Key": "access_logs.s3.enabled",
+                        "Value": "true"
+                    },
+                    {
+                        "Key": "access_logs.s3.bucket",
+                        "Value": {
+                            "Fn::ImportValue": {
+                                "Fn::Sub": "${TAGApplicationID}-${SecuityStackPipelineName}-TBGatewaySecurity-S3LoggingBucket"
+                            }
+                        }
+                    },
+                    {
+                        "Key": "access_logs.s3.prefix",
+                        "Value": {
+                            "Fn::Sub": "${NAMELoadBalancer}-Logs"
+                        }
+                    },
+                    {
+                        "Key": "deletion_protection.enabled",
+                        "Value": "false"
+                    }
+                ],
+                "Scheme": "internet-facing",
+                "SecurityGroups": [
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${TAGApplicationID}-${SecuityStackPipelineName}-TBGatewaySecurity-ExternalLoadBalancerSecurityGroup"
+                        }
+                    }
+                ],
+                "Subnets": {
+                    "Fn::If": [
+                        "SINGLE_INSTANCE_CLUSTER",
+                        [
+                            {
+                                "Fn::ImportValue": {
+                                    "Fn::Sub": "${VPCStackName}-PublicSubnet1"
+                                }
+                            },
+                            {
+                                "Fn::ImportValue": {
+                                    "Fn::Sub": "${VPCStackName}-PublicSubnet2"
+                                }
+                            }
+                        ],
+                        [
+                            {
+                                "Fn::ImportValue": {
+                                    "Fn::Sub": "${VPCStackName}-PublicSubnet1"
+                                }
+                            },
+                            {
+                                "Fn::ImportValue": {
+                                    "Fn::Sub": "${VPCStackName}-PublicSubnet2"
+                                }
+                            },
+                            {
+                                "Fn::ImportValue": {
+                                    "Fn::Sub": "${VPCStackName}-PublicSubnet3"
+                                }
+                            }
+                        ]
+                    ]
+                },
+                "Tags": [
+                    {
+                        "Key": "Application_ID",
+                        "Value": {
+                            "Ref": "TAGApplicationID"
+                        }
+                    },
+                    {
+                        "Key": "Description",
+                        "Value": {
+                            "Ref": "TAGDescription"
+                        }
+                    },
+                    {
+                        "Key": "Created_By",
+                        "Value": {
+                            "Ref": "TAGCreatedBy"
+                        }
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": {
+                            "Ref": "TAGEnvironment"
+                        }
+                    },
+                    {
+                        "Key": "Data_Class",
+                        "Value": {
+                            "Ref": "TAGDataClass"
+                        }
+                    },
+                    {
+                        "Key": "Termination_Date",
+                        "Value": {
+                            "Ref": "TAGTerminationDate"
+                        }
+                    },
+                    {
+                        "Key": "Cost_Center",
+                        "Value": {
+                            "Ref": "TAGCostCenter"
+                        }
+                    }
+                ],
+                "IpAddressType": "ipv4"
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "ca0729ed-e3de-49a1-a03f-a92814d3b8ef"
+                }
+            }
+        },
+        "SSOAppLBV2TargetGroup": {
+            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+            "Properties": {
+                "HealthCheckIntervalSeconds": 30,
+                "HealthCheckPath": "/",
+                "HealthCheckPort": 443,
+                "HealthCheckProtocol": "HTTPS",
+                "HealthCheckTimeoutSeconds": 10,
+                "HealthyThresholdCount": 4,
+                "UnhealthyThresholdCount": 4,
+                "Port": 443,
+                "Protocol": "HTTPS",
+                "Tags": [
+                    {
+                        "Key": "Application_ID",
+                        "Value": {
+                            "Ref": "TAGApplicationID"
+                        }
+                    },
+                    {
+                        "Key": "Description",
+                        "Value": {
+                            "Ref": "TAGDescription"
+                        }
+                    },
+                    {
+                        "Key": "Created_By",
+                        "Value": {
+                            "Ref": "TAGCreatedBy"
+                        }
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": {
+                            "Ref": "TAGEnvironment"
+                        }
+                    },
+                    {
+                        "Key": "Data_Class",
+                        "Value": {
+                            "Ref": "TAGDataClass"
+                        }
+                    },
+                    {
+                        "Key": "Termination_Date",
+                        "Value": {
+                            "Ref": "TAGTerminationDate"
+                        }
+                    },
+                    {
+                        "Key": "Cost_Center",
+                        "Value": {
+                            "Ref": "TAGCostCenter"
+                        }
+                    }
+                ],
+                "Targets": {
+                    "Fn::If": [
+                        "SINGLE_INSTANCE_CLUSTER",
+                        [
+                            {
+                                "Id": {
+                                    "Fn::ImportValue": {
+										   "Fn::Sub": "${TAGApplicationID}-${PipelineName}-TBGateway-${LoadBalancerVisibility}-Gateway1-InstanceID"
+									 }
+                                },
+                                "Port": 443
+                            }
+                        ],
+                        [
+                            {
+                                "Id": {
+                                    "Fn::ImportValue": {
+										"Fn::Sub": "${TAGApplicationID}-${PipelineName}-TBGateway-${LoadBalancerVisibility}-Gateway1-InstanceID"
+									}
+                                },
+                                "Port": 443
+                            },
+                            {
+                                "Id": {
+                                    "Fn::ImportValue": {
+										"Fn::Sub": "${TAGApplicationID}-${PipelineName}-TBGateway-${LoadBalancerVisibility}-Gateway2-InstanceID"
+									}
+                                },
+                                "Port": 443
+                            },
+                            {
+                                "Id": {
+                                    "Fn::ImportValue": {
+										"Fn::Sub": "${TAGApplicationID}-${PipelineName}-TBGateway-${LoadBalancerVisibility}-Gateway3-InstanceID"
+									}
+                                },
+                                "Port": 443
+                            }
+                        ]
+                    ]
+                },
+                "VpcId": {
+                    "Fn::ImportValue": {
+                        "Fn::Sub": "${VPCStackName}-VPC"
+                    }
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "70091299-25e3-4d5b-9b36-a07427ecc65f"
+                }
+            }
+        },
+        "SSOAdminLBV2TargetGroup": {
+            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+            "Condition": "externalLB",
+            "Properties": {
+                "HealthCheckIntervalSeconds": 30,
+                "HealthCheckPath": "/",
+                "HealthCheckPort": 443,
+                "HealthCheckProtocol": "HTTPS",
+                "HealthCheckTimeoutSeconds": 10,
+                "HealthyThresholdCount": 4,
+                "UnhealthyThresholdCount": 4,
+                "Port": 443,
+                "Protocol": "HTTPS",
+                "Tags": [
+                    {
+                        "Key": "Application_ID",
+                        "Value": {
+                            "Ref": "TAGApplicationID"
+                        }
+                    },
+                    {
+                        "Key": "Description",
+                        "Value": {
+                            "Ref": "TAGDescription"
+                        }
+                    },
+                    {
+                        "Key": "Created_By",
+                        "Value": {
+                            "Ref": "TAGCreatedBy"
+                        }
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": {
+                            "Ref": "TAGEnvironment"
+                        }
+                    },
+                    {
+                        "Key": "Data_Class",
+                        "Value": {
+                            "Ref": "TAGDataClass"
+                        }
+                    },
+                    {
+                        "Key": "Termination_Date",
+                        "Value": {
+                            "Ref": "TAGTerminationDate"
+                        }
+                    },
+                    {
+                        "Key": "Cost_Center",
+                        "Value": {
+                            "Ref": "TAGCostCenter"
+                        }
+                    }
+                ],
+                "Targets": {
+                    "Fn::If": [
+                        "SINGLE_INSTANCE_CLUSTER",
+                        [
+                            {
+                                "Id": {
+                                    "Fn::ImportValue": {
+										"Fn::Sub": "${TAGApplicationID}-${PipelineName}-TBGateway-${LoadBalancerVisibility}-Gateway1-InstanceID"
+									}
+                                },
+                                "Port": 443
+                            }
+                        ],
+                        [
+                            {
+                                "Id": {
+                                   "Fn::ImportValue": {
+										"Fn::Sub": "${TAGApplicationID}-${PipelineName}-TBGateway-${LoadBalancerVisibility}-Gateway1-InstanceID"
+									}
+                                },
+                                "Port": 443
+                            },
+                            {
+                                "Id": {                                  
+									"Fn::ImportValue": {
+										"Fn::Sub": "${TAGApplicationID}-${PipelineName}-TBGateway-${LoadBalancerVisibility}-Gateway2-InstanceID"
+									}
+                                },
+                                "Port": 443
+                            },
+                            {
+                                "Id": {
+                                    "Fn::ImportValue": {
+										"Fn::Sub": "${TAGApplicationID}-${PipelineName}-TBGateway-${LoadBalancerVisibility}-Gateway3-InstanceID"
+									}
+                                },
+                                "Port": 443
+                            }
+                        ]
+                    ]
+                },
+                "VpcId": {
+                    "Fn::ImportValue": {
+                        "Fn::Sub": "${VPCStackName}-VPC"
+                    }
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "0bc1642a-f8e9-4584-95b4-a83eea526467"
+                }
+            }
+        },
+        "SSOHTTPSApplLBV2Listener": {
+            "Type": "AWS::ElasticLoadBalancingV2::Listener",
+            "Properties": {
+                "Certificates": [
+                    {
+                        "CertificateArn": {
+                            "Ref": "GatewayLBSSLCertArn"
+                        }
+                    }
+                ],
+                "DefaultActions": [
+                    {
+                        "TargetGroupArn": {
+                            "Ref": "SSOAppLBV2TargetGroup"
+                        },
+                        "Type": "forward"
+                    }
+                ],
+                "Port": 443,
+                "Protocol": "HTTPS",
+                "LoadBalancerArn": {
+                    "Fn::If": [
+                        "internalLB",
+                        {
+                            "Ref": "SSOInternalLB"
+                        },
+                        {
+                            "Ref": "SSOExternalLB"
+                        }
+                    ]
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "d713b9c8-38ec-4e3c-81a0-64f212e4cae3"
+                }
+            }
+        },
+        "SSOApplLBV2HTTPListener": {
+            "Type": "AWS::ElasticLoadBalancingV2::Listener",
+            "Properties": {
+                "DefaultActions": [
+                    {
+                        "TargetGroupArn": {
+                            "Ref": "SSOAppLBV2TargetGroup"
+                        },
+                        "Type": "forward"
+                    }
+                ],
+                "Port": 80,
+                "Protocol": "HTTP",
+                "LoadBalancerArn": {
+                    "Fn::If": [
+                        "internalLB",
+                        {
+                            "Ref": "SSOInternalLB"
+                        },
+                        {
+                            "Ref": "SSOExternalLB"
+                        }
+                    ]
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "deb38a14-eb81-4871-8729-4df71f581fdd"
+                }
+            }
+        },
+        "SSOHTTPSAdminLBV2Listener": {
+            "Type": "AWS::ElasticLoadBalancingV2::Listener",
+            "Condition": "externalLB",
+            "Properties": {
+                "Certificates": [
+                    {
+                        "CertificateArn": {
+                            "Ref": "AdminLBSSLCertArn"
+                        }
+                    }
+                ],
+                "DefaultActions": [
+                    {
+                        "TargetGroupArn": {
+                            "Ref": "SSOAdminLBV2TargetGroup"
+                        },
+                        "Type": "forward"
+                    }
+                ],
+                "Port": 443,
+                "Protocol": "HTTPS",
+                "LoadBalancerArn": {
+                    "Ref": "SSOInternalLB"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "e31bacd0-91ac-42f7-9f36-6ffe6c6d876d"
+                }
+            }
+        },
+        "SSOAdminLBV2HTTPListener": {
+            "Type": "AWS::ElasticLoadBalancingV2::Listener",
+            "Condition": "externalLB",
+            "Properties": {
+                "DefaultActions": [
+                    {
+                        "TargetGroupArn": {
+                            "Ref": "SSOAdminLBV2TargetGroup"
+                        },
+                        "Type": "forward"
+                    }
+                ],
+                "Port": 80,
+                "Protocol": "HTTP",
+                "LoadBalancerArn": {
+                    "Ref": "SSOInternalLB"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "6da71610-8708-4bb0-9742-442f67a9816d"
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "InternalLBDNS": {
+            "Description": "Internal Load Balancer DNS Name",
+            "Value": {
+                "Fn::GetAtt": [
+                    "SSOInternalLB",
+                    "DNSName"
+                ]
+            },
+            "Export": {
+                "Name": {
+                    "Fn::If": [
+                        "internalLB",
+                        {
+                            "Fn::Sub": "${TAGApplicationID}-${PipelineName}-TBGateway-${LoadBalancerVisibility}-LB-DNS"
+                        },
+                        {
+                            "Fn::Sub": "${TAGApplicationID}-${PipelineName}-TBGateway-Admin-LB-DNS"
+                        }
+                    ]
+                }
+            }
+        },
+        "ExternalLBDNS": {
+            "Condition": "externalLB",
+            "Description": "External Load Balancer DNS Name",
+            "Value": {
+                "Fn::GetAtt": [
+                    "SSOExternalLB",
+                    "DNSName"
+                ]
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${TAGApplicationID}-${PipelineName}-TBGateway-${LoadBalancerVisibility}-LB-DNS"
+                }
+            }
+        }
+
+    }
+}
